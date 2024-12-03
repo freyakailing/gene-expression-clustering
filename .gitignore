@@ -1,3 +1,4 @@
 data.csv
 labels.csv
 TCGA-PANCAN-HiSeq-801x20531
+*.DS_Store

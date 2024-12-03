@@ -22,4 +22,14 @@ def read_data(seed=SEED):
 
     return data_shuffled, labels_shuffled
 
+# runs K-Means clustering with given number of clusters and returns ndarray with 
+# the index of the cluster each sample belongs to
+def kmeans(data, num_clusters, seed=SEED):
+    kmeans = sklearn.cluster.KMeans(n_clusters=num_clusters, random_state=seed)
+    kmeans.fit(data)
+
+    return kmeans.labels_
+
+
 data, labels = read_data()
+kmeans_labels = kmeans(data, 5)
