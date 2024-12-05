@@ -34,7 +34,7 @@ def graph_2d(data, labels):
     # (recommended in t-SNE documentation but it looks like it's doing good as-is)
 
     # uses t-SNE to reduce to 2 components
-    data_2d = TSNE().fit_transform(data)
+    data_2d = TSNE(random_state=SEED).fit_transform(data)
 
     # combines reduced data and labels in dataframe
     data_2d_labeled = labels.to_frame()
@@ -102,4 +102,5 @@ def test_kMeans():
 data, labels = read_data()
 
 kmeans_labels = kmeans(data, 6)
-plot = graph_2d(data, kmeans_labels)
+plot = graph_2d(data, labels)
+plot.save("Samples by Cancer Type")
