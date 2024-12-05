@@ -1,7 +1,6 @@
 # Freya Kailing and Isabella Moppel
 # CSCI 373
-# Last updated 12/02/24
-
+# Last updated 12/05/24
 
 import pandas
 import sklearn.cluster
@@ -17,7 +16,7 @@ def perform_KMeans (data):
     silhouettes_KMeans = kmeans_silhouettes(80, data)
     best_cluster_KMeans = findBestClusterValue (silhouettes_KMeans)
     kmeans_labels = kmeans(data, best_cluster_KMeans)
-    graph_2d(data, kmeans_labels)
+    graph_2d(data, kmeans_labels, "K Means Clusters")
 
 # reads in data and labels and shuffles
 def read_data(seed=SEED):
@@ -101,14 +100,12 @@ def kmeans_silhouettes (maxClusterValue, X, seed=SEED):
     return silhouettes
 
 def findBestClusterValue (silhouettes):
-    max_cluster = 2;
+    max_cluster = 2
     for cluster in silhouettes:
         if silhouettes[cluster] > silhouettes[max_cluster]:
             max_cluster = cluster
     return max_cluster
 
-
 data, labels = read_data()
-#print(data.head())
 
 perform_KMeans(data)
