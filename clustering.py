@@ -62,7 +62,8 @@ def kmeans(data, num_clusters, seed=SEED):
     labels = pandas.Series(labels).rename("label")
     return labels
 
-def calculateSilhouetteScore (range_n_clusters, X, seed=SEED):
+# runs K-Means clustering with a range of values for number of clusters and prints and returns silhouette scores
+def kmeans_silhouettes (range_n_clusters, X, seed=SEED):
     silhouettes = {}
     for n_clusters in range_n_clusters:
 
@@ -90,7 +91,7 @@ def test_kMeans():
     for i in range (2, 81):
         range_n_clusters.append(i)
 
-    silhouettes = calculateSilhouetteScore(range_n_clusters, data)
+    silhouettes = kmeans_silhouettes(range_n_clusters, data)
 
     max_cluster = 2;
     for cluster in silhouettes:
