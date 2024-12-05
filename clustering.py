@@ -64,7 +64,13 @@ def kmeans(data, num_clusters, seed=SEED):
     labels = pandas.Series(labels).rename("label")
     return labels
 
-def calculateSilhouetteScore (range_n_clusters, X, seed=SEED):
+def calculateSilhouetteScore (maxClusterValue, X, seed=SEED):
+
+    range_n_clusters = []
+
+    for i in range (2, maxClusterValue+1):
+        range_n_clusters.append(i)
+
     silhouettes = {}
     for n_clusters in range_n_clusters:
 
@@ -97,14 +103,8 @@ def findBestClusterValue (silhouettes):
 data, labels = read_data()
 #print(data.head())
 
-range_n_clusters = []
-
-for i in range (2, 81):
-    range_n_clusters.append(i)
-
-silhouettes = calculateSilhouetteScore(range_n_clusters, data)
-
-best_cluster = findBestClusterValue (silhouettes)
-
-kmeans_labels = kmeans(data, best_cluster)
+# K Means
+silhouettes_KMeans = calculateSilhouetteScore(80, data)
+best_cluster_KMeans = findBestClusterValue (silhouettes_KMeans)
+kmeans_labels = kmeans(data, best_cluster_KMeans)
 graph_2d(data, kmeans_labels)
