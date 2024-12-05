@@ -89,9 +89,18 @@ def calculateSilhouetteScore (range_n_clusters, X, seed=SEED):
 
 data, labels = read_data()
 #print(data.head())
-range_n_clusters = [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+
+range_n_clusters = []
+
+for i in range (2, 101):
+    range_n_clusters.append(i)
+
 silhouettes = calculateSilhouetteScore(range_n_clusters, data)
 
+max_cluster = 2;
+for cluster in silhouettes:
+    if silhouettes[cluster] > silhouettes[max_cluster]:
+        max_cluster = cluster
 
-#kmeans_labels = kmeans(data, num_clusters)
-#graph_2d(data, kmeans_labels)
+kmeans_labels = kmeans(data, max_cluster)
+graph_2d(data, kmeans_labels)
