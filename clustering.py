@@ -7,6 +7,7 @@ import sklearn.cluster
 from plotnine import *
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+from sklearn.metrics import silhouette_samples, silhouette_score
 
 SEED = 12345
 
@@ -62,7 +63,35 @@ def kmeans(data, num_clusters, seed=SEED):
     labels = pandas.Series(labels).rename("label")
     return labels
 
+def calculateSilhouetteScore (range_n_clusters, X, seed=SEED):
+    silhouettes = {}
+    for n_clusters in range_n_clusters:
+
+        clusterer = sklearn.cluster.KMeans(n_clusters=n_clusters, random_state=seed)
+        cluster_labels = clusterer.fit_predict(X)
+
+        # The silhouette_score gives the average value for all the samples.
+        # This gives a perspective into the density and separation of the formed
+        # clusters
+        silhouette_avg = silhouette_score(X, cluster_labels)
+        print(
+            "For n_clusters =",
+            n_clusters,
+            "The average silhouette_score is :",
+            silhouette_avg,
+        )
+        silhouettes[n_clusters] = silhouette_avg
+    
+    return silhouettes
+
+    
+
 
 data, labels = read_data()
-kmeans_labels = kmeans(data, 5)
-graph_2d(data, kmeans_labels)
+#print(data.head())
+range_n_clusters = [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+silhouettes = calculateSilhouetteScore(range_n_clusters, data)
+
+
+#kmeans_labels = kmeans(data, num_clusters)
+#graph_2d(data, kmeans_labels)
