@@ -1,6 +1,7 @@
 # Freya Kailing and Isabella Moppel
 # CSCI 373
-# Last updated 12/05/24
+# Last updated 12/02/24
+
 
 import pandas
 import sklearn.cluster
@@ -34,12 +35,14 @@ def graph_2d(data, labels):
     # (recommended in t-SNE documentation but it looks like it's doing good as-is)
 
     # uses t-SNE to reduce to 2 components
-    data_2d = TSNE(random_state=SEED).fit_transform(data)
+    data_2d = TSNE().fit_transform(data)
 
     # combines reduced data and labels in dataframe
     data_2d_labeled = labels.to_frame()
     data_2d_labeled["component_1"] = data_2d[:,0].tolist()
-    data_2d_labeled["component_2"] = data_2d[:,1].tolist()\
+    data_2d_labeled["component_2"] = data_2d[:,1].tolist()
+
+    print(data_2d_labeled.head())
 
     # graphs data in t-SNE embedded space
     plot = (
@@ -47,8 +50,7 @@ def graph_2d(data, labels):
         + aes(x="component_1", y="component_2",shape="factor(label)", color="factor(label)")
         + geom_point()
         )
-    
-    return plot
+    plot.show()
 
 
 # runs K-Means clustering with given number of clusters and returns Series with 
@@ -63,7 +65,13 @@ def kmeans(data, num_clusters, seed=SEED):
     return labels
 
 # runs K-Means clustering with a range of values for number of clusters and prints and returns silhouette scores
-def kmeans_silhouettes (range_n_clusters, X, seed=SEED):
+def kmeans_silhouettes (maxClusterValue, X, seed=SEED):
+
+    range_n_clusters = []
+
+    for i in range (2, maxClusterValue+1):
+        range_n_clusters.append(i)
+
     silhouettes = {}
     for n_clusters in range_n_clusters:
 
@@ -84,24 +92,20 @@ def kmeans_silhouettes (range_n_clusters, X, seed=SEED):
     
     return silhouettes
 
-# finds the best number of clusters for k-Means algorithm
-def test_kMeans():
-    range_n_clusters = []
-
-    for i in range (2, 81):
-        range_n_clusters.append(i)
-
-    silhouettes = kmeans_silhouettes(range_n_clusters, data)
-
+def findBestClusterValue (silhouettes):
     max_cluster = 2;
     for cluster in silhouettes:
         if silhouettes[cluster] > silhouettes[max_cluster]:
             max_cluster = cluster
-    
     return max_cluster
 
-data, labels = read_data()
 
-kmeans_labels = kmeans(data, 6)
-plot = graph_2d(data, labels)
-plot.save("Samples by Cancer Type")
+
+data, labels = read_data()
+#print(data.head())
+
+# K Means
+silhouettes_KMeans = calculateSilhouetteScore(80, data)
+best_cluster_KMeans = findBestClusterValue (silhouettes_KMeans)
+kmeans_labels = kmeans(data, best_cluster_KMeans)
+graph_2d(data, kmeans_labels)
