@@ -99,7 +99,6 @@ def findBestClusterValue (silhouettes):
     return max_cluster
 
 
-
 data, labels = read_data()
 #print(data.head())
 
