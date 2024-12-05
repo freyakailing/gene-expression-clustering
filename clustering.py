@@ -85,6 +85,14 @@ def calculateSilhouetteScore (range_n_clusters, X, seed=SEED):
     
     return silhouettes
 
+def findBestClusterValue (silhouettes):
+    max_cluster = 2;
+    for cluster in silhouettes:
+        if silhouettes[cluster] > silhouettes[max_cluster]:
+            max_cluster = cluster
+    return max_cluster
+
+
 
 data, labels = read_data()
 #print(data.head())
@@ -96,10 +104,7 @@ for i in range (2, 81):
 
 silhouettes = calculateSilhouetteScore(range_n_clusters, data)
 
-max_cluster = 2;
-for cluster in silhouettes:
-    if silhouettes[cluster] > silhouettes[max_cluster]:
-        max_cluster = cluster
+best_cluster = findBestClusterValue (silhouettes)
 
-kmeans_labels = kmeans(data, max_cluster)
+kmeans_labels = kmeans(data, best_cluster)
 graph_2d(data, kmeans_labels)
