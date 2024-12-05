@@ -39,9 +39,7 @@ def graph_2d(data, labels):
     # combines reduced data and labels in dataframe
     data_2d_labeled = labels.to_frame()
     data_2d_labeled["component_1"] = data_2d[:,0].tolist()
-    data_2d_labeled["component_2"] = data_2d[:,1].tolist()
-
-    print(data_2d_labeled.head())
+    data_2d_labeled["component_2"] = data_2d[:,1].tolist()\
 
     # graphs data in t-SNE embedded space
     plot = (
@@ -49,7 +47,8 @@ def graph_2d(data, labels):
         + aes(x="component_1", y="component_2",shape="factor(label)", color="factor(label)")
         + geom_point()
         )
-    plot.show()
+    
+    return plot
 
 
 # runs K-Means clustering with given number of clusters and returns Series with 
@@ -84,23 +83,23 @@ def calculateSilhouetteScore (range_n_clusters, X, seed=SEED):
     
     return silhouettes
 
-    
+# finds the best number of clusters for k-Means algorithm
+def test_kMeans():
+    range_n_clusters = []
 
+    for i in range (2, 81):
+        range_n_clusters.append(i)
+
+    silhouettes = calculateSilhouetteScore(range_n_clusters, data)
+
+    max_cluster = 2;
+    for cluster in silhouettes:
+        if silhouettes[cluster] > silhouettes[max_cluster]:
+            max_cluster = cluster
+    
+    return max_cluster
 
 data, labels = read_data()
-#print(data.head())
 
-range_n_clusters = []
-
-for i in range (2, 81):
-    range_n_clusters.append(i)
-
-silhouettes = calculateSilhouetteScore(range_n_clusters, data)
-
-max_cluster = 2;
-for cluster in silhouettes:
-    if silhouettes[cluster] > silhouettes[max_cluster]:
-        max_cluster = cluster
-
-kmeans_labels = kmeans(data, max_cluster)
-graph_2d(data, kmeans_labels)
+kmeans_labels = kmeans(data, 6)
+plot = graph_2d(data, kmeans_labels)
