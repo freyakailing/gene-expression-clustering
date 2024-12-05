@@ -12,6 +12,13 @@ from sklearn.metrics import silhouette_samples, silhouette_score
 
 SEED = 12345
 
+# K Means
+def perform_KMeans (data):
+    silhouettes_KMeans = kmeans_silhouettes(80, data)
+    best_cluster_KMeans = findBestClusterValue (silhouettes_KMeans)
+    kmeans_labels = kmeans(data, best_cluster_KMeans)
+    graph_2d(data, kmeans_labels)
+
 # reads in data and labels and shuffles
 def read_data(seed=SEED):
     data = pandas.read_csv("TCGA-PANCAN-HiSeq-801x20531/data.csv", index_col = 0)
@@ -30,7 +37,7 @@ def read_data(seed=SEED):
 
 # visualizes data in two dimensions, colored by actual class or cluster
 # (requires DataFrame for "data", Series or DataFrame for "labels")
-def graph_2d(data, labels):
+def graph_2d(data, labels, title):
     # TODO maybe: use principal component analysis to reduce to ~50 attributes
     # (recommended in t-SNE documentation but it looks like it's doing good as-is)
 
@@ -51,6 +58,7 @@ def graph_2d(data, labels):
         + geom_point()
         )
     plot.show()
+    plot.save(title)
 
 
 # runs K-Means clustering with given number of clusters and returns Series with 
@@ -103,8 +111,4 @@ def findBestClusterValue (silhouettes):
 data, labels = read_data()
 #print(data.head())
 
-# K Means
-silhouettes_KMeans = kmeans_silhouettes(80, data)
-best_cluster_KMeans = findBestClusterValue (silhouettes_KMeans)
-kmeans_labels = kmeans(data, best_cluster_KMeans)
-graph_2d(data, kmeans_labels)
+perform_KMeans(data)
