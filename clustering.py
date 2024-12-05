@@ -92,7 +92,7 @@ data, labels = read_data()
 
 range_n_clusters = []
 
-for i in range (2, 101):
+for i in range (2, 81):
     range_n_clusters.append(i)
 
 silhouettes = calculateSilhouetteScore(range_n_clusters, data)
