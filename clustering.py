@@ -84,8 +84,6 @@ def calculateSilhouetteScore (range_n_clusters, X, seed=SEED):
     
     return silhouettes
 
-    
-
 
 data, labels = read_data()
 #print(data.head())
