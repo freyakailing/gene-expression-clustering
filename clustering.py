@@ -4,6 +4,7 @@
 
 import pandas
 import sklearn.cluster
+import sklearn.mixture
 from plotnine import *
 from sklearn.manifold import TSNE
 from sklearn.metrics import silhouette_score
@@ -25,6 +26,13 @@ def perform_spectral(data):
     best_cluster_num = findBestClusterValue(silhouettes)
     spectral_clusters = spectral_clustering(data, best_cluster_num)
     graph_2d(data, spectral_clusters, "Spectral Clusters")
+
+# Gaussain mixture labelling
+def perform_gaussian(data):
+    silhouettes = gaussian_silhouettes(20, data)
+    best_cluster_num = findBestClusterValue(silhouettes)
+    gaussian_clusters = gaussian_mixture(data, best_cluster_num)
+    graph_2d(data, gaussian_clusters, "Gaussian Mixture Clusters")
 
 # reads in data and labels and shuffles
 def read_data(seed=SEED):
@@ -128,6 +136,30 @@ def spectral_silhouettes (maxClusterValue, X, seed=SEED):
     
     return silhouettes
 
+# runs a gaussian mixture estimation for a given number of clusters, returns Series of cluster indices
+def gaussian_mixture(data, num_clusters):
+    # diagonal covariance used for speed (compared to full)
+    gaussian = sklearn.mixture.GaussianMixture(n_components=num_clusters, covariance_type='diag', random_state=SEED)
+    labels = gaussian.fit_predict(data)
+
+    # converts labels to Series named "labels" to make display easier
+    labels = pandas.Series(labels).rename("label")
+    return labels
+
+# runs gaussian mixture clustering with a range of values for num_clusters and prints and returns silhouette scores
+def gaussian_silhouettes (maxClusterValue, X, seed=SEED):
+    range_n_clusters = list(range(2, maxClusterValue+1))
+
+    silhouettes = {}
+    for n_clusters in range_n_clusters:
+        cluster_labels = gaussian_mixture(X, n_clusters)
+
+        silhouette_avg = silhouette_score(X, cluster_labels)
+        print(f"n_clusters: {n_clusters}, Average silhouette_score: {silhouette_avg}")
+        silhouettes[n_clusters] = silhouette_avg
+    
+    return silhouettes
+
 def findBestClusterValue (silhouettes):
     max_cluster = 2
     for cluster in silhouettes:
@@ -136,4 +168,3 @@ def findBestClusterValue (silhouettes):
     return max_cluster
 
 data, labels = read_data()
-perform_spectral(data)
