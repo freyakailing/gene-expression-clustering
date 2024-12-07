@@ -5,18 +5,26 @@
 import pandas
 import sklearn.cluster
 from plotnine import *
-from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-from sklearn.metrics import silhouette_samples, silhouette_score
+from sklearn.metrics import silhouette_score
+from sklearn.neighbors import kneighbors_graph
+from scipy.spatial.distance import pdist,squareform
 
 SEED = 12345
 
 # K Means
 def perform_KMeans (data):
     silhouettes_KMeans = kmeans_silhouettes(80, data)
-    best_cluster_KMeans = findBestClusterValue (silhouettes_KMeans)
+    best_cluster_KMeans = findBestClusterValue(silhouettes_KMeans)
     kmeans_labels = kmeans(data, best_cluster_KMeans)
     graph_2d(data, kmeans_labels, "K Means Clusters")
+
+# Spectral clustering
+def perform_spectral(data):
+    silhouettes = spectral_silhouettes(20, data)
+    best_cluster_num = findBestClusterValue(silhouettes)
+    spectral_clusters = spectral_clustering(data, best_cluster_num)
+    graph_2d(data, spectral_clusters, "Spectral Clusters")
 
 # reads in data and labels and shuffles
 def read_data(seed=SEED):
@@ -48,8 +56,6 @@ def graph_2d(data, labels, title):
     data_2d_labeled["component_1"] = data_2d[:,0].tolist()
     data_2d_labeled["component_2"] = data_2d[:,1].tolist()
 
-    print(data_2d_labeled.head())
-
     # graphs data in t-SNE embedded space
     plot = (
         ggplot(data_2d_labeled)
@@ -58,7 +64,6 @@ def graph_2d(data, labels, title):
         )
     plot.show()
     plot.save(title)
-
 
 # runs K-Means clustering with given number of clusters and returns Series with 
 # the index of the cluster each sample belongs to
@@ -99,6 +104,30 @@ def kmeans_silhouettes (maxClusterValue, X, seed=SEED):
     
     return silhouettes
 
+# runs spectral clustering for a given number of clusters, returns Series of cluster indices
+def spectral_clustering(data, num_clusters):
+    # constructs affinity matrix by computing a graph of nearest neighbors, then applies clustering methods
+    spectral = sklearn.cluster.SpectralClustering(affinity='nearest_neighbors', n_clusters=num_clusters, random_state=SEED)
+    labels = spectral.fit_predict(data)
+
+    # converts labels to Series named "labels" to make display easier
+    labels = pandas.Series(labels).rename("label")
+    return labels
+
+# runs spectral clustering with a range of values for number of clusters and prints and returns silhouette scores
+def spectral_silhouettes (maxClusterValue, X, seed=SEED):
+    range_n_clusters = list(range(2, maxClusterValue+1))
+
+    silhouettes = {}
+    for n_clusters in range_n_clusters:
+        cluster_labels = spectral_clustering(X, n_clusters)
+
+        silhouette_avg = silhouette_score(X, cluster_labels)
+        print(f"n_clusters: {n_clusters}, Average silhouette_score: {silhouette_avg}")
+        silhouettes[n_clusters] = silhouette_avg
+    
+    return silhouettes
+
 def findBestClusterValue (silhouettes):
     max_cluster = 2
     for cluster in silhouettes:
@@ -107,5 +136,4 @@ def findBestClusterValue (silhouettes):
     return max_cluster
 
 data, labels = read_data()
-
-perform_KMeans(data)
+perform_spectral(data)
