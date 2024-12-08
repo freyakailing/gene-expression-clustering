@@ -10,15 +10,17 @@ from sklearn.manifold import TSNE
 from sklearn.metrics import silhouette_score
 from sklearn.neighbors import kneighbors_graph
 from scipy.spatial.distance import pdist,squareform
+from sklearn.cluster import DBSCAN
 
 SEED = 12345
+BEST_EPS = 0
 
 # K Means
 def perform_KMeans (data):
-    silhouettes_KMeans = kmeans_silhouettes(80, data)
-    best_cluster_KMeans = findBestClusterValue(silhouettes_KMeans)
-    kmeans_labels = kmeans(data, best_cluster_KMeans)
-    graph_2d(data, kmeans_labels, "K Means Clusters")
+    silhouettes = kmeans_silhouettes(80, data)
+    best_cluster_num = findBestClusterValue(silhouettes)
+    kmeans_clusters = kmeans(data, best_cluster_num)
+    graph_2d(data, kmeans_clusters, "K Means Clusters")
 
 # Spectral clustering
 def perform_spectral(data):
@@ -27,12 +29,27 @@ def perform_spectral(data):
     spectral_clusters = spectral_clustering(data, best_cluster_num)
     graph_2d(data, spectral_clusters, "Spectral Clusters")
 
-# Gaussain mixture labelling
+# Gaussian mixture labelling
 def perform_gaussian(data):
     silhouettes = gaussian_silhouettes(20, data)
     best_cluster_num = findBestClusterValue(silhouettes)
     gaussian_clusters = gaussian_mixture(data, best_cluster_num)
     graph_2d(data, gaussian_clusters, "Gaussian Mixture Clusters")
+
+# DBSCAN
+def perform_dbscan(data):
+    silhouettes = dbscan_silhouettes(20, data)
+    best_cluster_num = findBestClusterValue(silhouettes)
+    dbscan_clusters = dbscan(data, best_cluster_num)
+    graph_2d(data, dbscan_clusters, "DBSCAN Clusters")
+
+# Mini Batch K Means
+def perform_mini_batch_KMeans (data):
+    silhouettes = mini_batch_kmeans_silhouettes(80, data)
+    best_cluster_num = findBestClusterValue(silhouettes)
+    mini_kmeans_clusters = mini_batch_kmeans(data, best_cluster_num)
+    graph_2d(data, mini_kmeans_clusters, "Mini Batch K Means Clusters")
+
 
 # reads in data and labels and shuffles
 def read_data(seed=SEED):
@@ -160,6 +177,80 @@ def gaussian_silhouettes (maxClusterValue, X, seed=SEED):
     
     return silhouettes
 
+
+# runs dbscan estimation given a certain min_samples
+def dbscan(data, min_samples):
+    # run dbscan
+    labels = sklearn.cluster.dbscan(eps = BEST_EPS, min_samples = min_samples).fit_predict(data)
+    # converts labels to Series named "labels" to make display easier
+    labels = pandas.Series(labels).rename("label")
+    return labels
+
+# runs dbscan clustering with a range of values for num_clusters and a range of values for eps;
+#  prints and returns silhouette scores
+def dbscan_silhouettes (max_min_samples, X): # no seed
+    range_min_samples = list(range(2, max_min_samples+1))
+
+    # eps determines how far apart points need to be in order to be considered distinct. floats
+    range_eps = list(range(1, 11))
+    range_eps = [ep / 10.0 for ep in range_eps]  # eps will range from 0.1 to 1.0
+    print(range_eps)
+
+    silhouettes = {}
+
+    for min_sample in range_min_samples:
+        print( str(min_sample) + "\n")
+        for ep in range_eps:
+            cluster_labels = DBSCAN(eps = ep, min_samples = min_sample).fit_predict(X)
+            print(cluster_labels)
+            num_clusters = len(set(cluster_labels)) - (1 if -1 in cluster_labels else 0) # a label of -1 -> noise
+            print(num_clusters)
+            if num_clusters > 1: # silhouette score will only work if there are at least 2 clusters
+                silhouette_avg = silhouette_score(X, cluster_labels)
+                print(f"min sample: {min_sample}, eps: {ep}, Average silhouette_score: {silhouette_avg}")
+                if silhouette_avg > silhouettes[min_sample]: # choose the best value of eps to put in
+                    silhouettes[min_sample] = silhouette_avg
+                    BEST_EPS = ep # save the best value of eps to use later
+
+    return silhouettes
+
+
+# runs Mini-K-Means clustering with given number of clusters and returns Series with 
+# the index of the cluster each sample belongs to
+def mini_batch_kmeans(data, num_clusters, seed=SEED):
+    mini_kmeans = sklearn.cluster.MiniBatchKMeans(n_clusters=num_clusters, random_state=seed)
+    mini_kmeans.fit(data)
+    labels = mini_kmeans.labels_
+
+    # converts labels to Series named "labels" to make display easier
+    labels = pandas.Series(labels).rename("label")
+    return labels
+
+
+# runs Mini Batch K-Means clustering with a range of values for number of clusters and prints and returns silhouette scores
+def mini_batch_kmeans_silhouettes (maxClusterValue, X, seed=SEED):
+
+    range_n_clusters = []
+
+    for i in range (2, maxClusterValue+1):
+        range_n_clusters.append(i)
+
+    silhouettes = {}
+    for n_clusters in range_n_clusters:
+
+        clusterer = sklearn.cluster.MiniBatchKMeans(n_clusters=n_clusters, random_state=seed)
+        cluster_labels = clusterer.fit_predict(X)
+
+        # The silhouette_score gives the average value for all the samples.
+        # This gives a perspective into the density and separation of the formed
+        # clusters
+        silhouette_avg = silhouette_score(X, cluster_labels)
+        print("For n_clusters =", n_clusters, "The average silhouette_score is :", silhouette_avg)
+        silhouettes[n_clusters] = silhouette_avg
+    
+    return silhouettes
+
+
 def findBestClusterValue (silhouettes):
     max_cluster = 2
     for cluster in silhouettes:
@@ -168,3 +259,6 @@ def findBestClusterValue (silhouettes):
     return max_cluster
 
 data, labels = read_data()
+
+# perform_dbscan(data)
+perform_mini_batch_KMeans(data)
