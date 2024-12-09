@@ -25,7 +25,7 @@ def perform_KMeans (data, labels):
     graph_2d(data, kmeans_clusters, "K Means Clusters")
     mi_score = mutual_info_score(labels, kmeans_clusters)
     rscore = rand_score(labels, kmeans_clusters)
-    print("KMeans has a mutual information score of " + mi_score + " and a rand score of " + rscore )
+    print("KMeans has a mutual information score of " + str(mi_score) + " and a rand score of " + str(rscore ))
 
 # Spectral clustering
 def perform_spectral(data, labels):
@@ -35,7 +35,7 @@ def perform_spectral(data, labels):
     graph_2d(data, spectral_clusters, "Spectral Clusters")
     mi_score = mutual_info_score(labels, spectral_clusters)
     rscore = rand_score(labels, spectral_clusters)
-    print("Spectral clustering has a mutual information score of " + mi_score + " and a rand score of " + rscore)
+    print("Spectral clustering has a mutual information score of " + str(mi_score) + " and a rand score of " + str(rscore))
 
 # Gaussian mixture labelling
 def perform_gaussian(data, labels):
@@ -45,7 +45,7 @@ def perform_gaussian(data, labels):
     graph_2d(data, gaussian_clusters, "Gaussian Mixture Clusters")
     mi_score = mutual_info_score(labels, gaussian_clusters)
     rscore = rand_score(labels, gaussian_clusters)
-    print("Gaussian mixture labelling has a mutual information score of " + mi_score + " and a rand score of " + rscore)
+    print("Gaussian mixture labelling has a mutual information score of " + str(mi_score) + " and a rand score of " + str(rscore))
 
 # DBSCAN
 def perform_dbscan(data, labels):
@@ -55,7 +55,7 @@ def perform_dbscan(data, labels):
     graph_2d(data, dbscan_clusters, "DBSCAN Clusters")
     mi_score = mutual_info_score(labels, dbscan_clusters)
     rscore = rand_score(labels, dbscan_clusters)
-    print("DBSCAN has a mutual information score of " + mi_score + " and a rand score of " + rscore)
+    print("DBSCAN has a mutual information score of " + str(mi_score) + " and a rand score of " + str(rscore))
 
 # Mini Batch K Means
 def perform_mini_batch_KMeans (data, labels):
@@ -65,7 +65,7 @@ def perform_mini_batch_KMeans (data, labels):
     graph_2d(data, mini_kmeans_clusters, "Mini Batch K Means Clusters")
     mi_score = mutual_info_score(labels, mini_kmeans_clusters)
     rscore = rand_score(labels, mini_kmeans_clusters)
-    print("Mini batch KMeans has a mutual information score of " + mi_score + " and a rand score of " + rscore)
+    print("Mini batch KMeans has a mutual information score of " + str(mi_score) + " and a rand score of " + str(rscore))
 
 
 # reads in data and labels and shuffles
