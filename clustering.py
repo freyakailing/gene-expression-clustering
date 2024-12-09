@@ -11,44 +11,61 @@ from sklearn.metrics import silhouette_score
 from sklearn.neighbors import kneighbors_graph
 from scipy.spatial.distance import pdist,squareform
 from sklearn.cluster import DBSCAN
+from sklearn.metrics import mutual_info_score
+from sklearn.metrics.cluster import rand_score
 
 SEED = 12345
 BEST_EPS = 0
 
 # K Means
-def perform_KMeans (data):
+def perform_KMeans (data, labels):
     silhouettes = kmeans_silhouettes(80, data)
     best_cluster_num = findBestClusterValue(silhouettes)
     kmeans_clusters = kmeans(data, best_cluster_num)
     graph_2d(data, kmeans_clusters, "K Means Clusters")
+    mi_score = mutual_info_score(labels, kmeans_clusters)
+    rscore = rand_score(labels, kmeans_clusters)
+    print("KMeans has a mutual information score of " + mi_score + " and a rand score of " + rscore )
 
 # Spectral clustering
-def perform_spectral(data):
+def perform_spectral(data, labels):
     silhouettes = spectral_silhouettes(20, data)
     best_cluster_num = findBestClusterValue(silhouettes)
     spectral_clusters = spectral_clustering(data, best_cluster_num)
     graph_2d(data, spectral_clusters, "Spectral Clusters")
+    mi_score = mutual_info_score(labels, spectral_clusters)
+    rscore = rand_score(labels, spectral_clusters)
+    print("Spectral clustering has a mutual information score of " + mi_score + " and a rand score of " + rscore)
 
 # Gaussian mixture labelling
-def perform_gaussian(data):
+def perform_gaussian(data, labels):
     silhouettes = gaussian_silhouettes(20, data)
     best_cluster_num = findBestClusterValue(silhouettes)
     gaussian_clusters = gaussian_mixture(data, best_cluster_num)
     graph_2d(data, gaussian_clusters, "Gaussian Mixture Clusters")
+    mi_score = mutual_info_score(labels, gaussian_clusters)
+    rscore = rand_score(labels, gaussian_clusters)
+    print("Gaussian mixture labelling has a mutual information score of " + mi_score + " and a rand score of " + rscore)
 
 # DBSCAN
-def perform_dbscan(data):
+def perform_dbscan(data, labels):
     silhouettes = dbscan_silhouettes(20, data)
     best_cluster_num = findBestClusterValue(silhouettes)
     dbscan_clusters = dbscan(data, best_cluster_num)
     graph_2d(data, dbscan_clusters, "DBSCAN Clusters")
+    mi_score = mutual_info_score(labels, dbscan_clusters)
+    rscore = rand_score(labels, dbscan_clusters)
+    print("DBSCAN has a mutual information score of " + mi_score + " and a rand score of " + rscore)
 
 # Mini Batch K Means
-def perform_mini_batch_KMeans (data):
+def perform_mini_batch_KMeans (data, labels):
     silhouettes = mini_batch_kmeans_silhouettes(80, data)
     best_cluster_num = findBestClusterValue(silhouettes)
     mini_kmeans_clusters = mini_batch_kmeans(data, best_cluster_num)
     graph_2d(data, mini_kmeans_clusters, "Mini Batch K Means Clusters")
+    mi_score = mutual_info_score(labels, mini_kmeans_clusters)
+    rscore = rand_score(labels, mini_kmeans_clusters)
+    print("Mini batch KMeans has a mutual information score of " + mi_score + " and a rand score of " + rscore)
 
 
 # reads in data and labels and shuffles
@@ -261,4 +278,7 @@ def findBestClusterValue (silhouettes):
 data, labels = read_data()
 
 # perform_dbscan(data)
-perform_mini_batch_KMeans(data)
+perform_KMeans(data, labels)
+perform_spectral(data, labels)
+perform_gaussian(data, labels)
+perform_mini_batch_KMeans(data, labels)
