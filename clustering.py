@@ -100,6 +100,7 @@ def graph_2d(data, labels, title):
         ggplot(data_2d_labeled)
         + aes(x="component_1", y="component_2",shape="factor(label)", color="factor(label)")
         + geom_point()
+        + ggtitle(title)
         )
     plot.show()
     plot.save(title)
@@ -275,6 +276,7 @@ def findBestClusterValue (silhouettes):
 data, labels = read_data()
 
 # perform_dbscan(data)
+graph_2d(data, labels, "Actual Cancer Types")
 perform_KMeans(data, labels)
 perform_spectral(data, labels)
 perform_gaussian(data, labels)
