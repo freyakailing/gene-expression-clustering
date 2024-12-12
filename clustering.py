@@ -1,6 +1,6 @@
 # Freya Kailing and Isabella Moppel
 # CSCI 373
-# Last updated 12/05/24
+# Last updated 12/12/24
 
 import pandas
 import sklearn.cluster
@@ -19,7 +19,7 @@ BEST_EPS = 0
 
 # K Means
 def perform_KMeans (data, labels):
-    silhouettes = kmeans_silhouettes(80, data)
+    silhouettes = kmeans_silhouettes(20, data)
     best_cluster_num = findBestClusterValue(silhouettes)
     kmeans_clusters = kmeans(data, best_cluster_num)
     graph_2d(data, kmeans_clusters, "K Means Clusters")
@@ -59,7 +59,7 @@ def perform_dbscan(data, labels):
 
 # Mini Batch K Means
 def perform_mini_batch_KMeans (data, labels):
-    silhouettes = mini_batch_kmeans_silhouettes(80, data)
+    silhouettes = mini_batch_kmeans_silhouettes(20, data)
     best_cluster_num = findBestClusterValue(silhouettes)
     mini_kmeans_clusters = mini_batch_kmeans(data, best_cluster_num)
     graph_2d(data, mini_kmeans_clusters, "Mini Batch K Means Clusters")
@@ -87,11 +87,8 @@ def read_data(seed=SEED):
 # visualizes data in two dimensions, colored by actual class or cluster
 # (requires DataFrame for "data", Series or DataFrame for "labels")
 def graph_2d(data, labels, title):
-    # TODO maybe: use principal component analysis to reduce to ~50 attributes
-    # (recommended in t-SNE documentation but it looks like it's doing good as-is)
-
     # uses t-SNE to reduce to 2 components
-    data_2d = TSNE().fit_transform(data)
+    data_2d = TSNE(random_state=SEED).fit_transform(data)
 
     # combines reduced data and labels in dataframe
     data_2d_labeled = labels.to_frame()
