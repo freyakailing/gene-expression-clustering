@@ -2,6 +2,4 @@
 
 Uses data downloaded from https://archive.ics.uci.edu/dataset/401/gene+expression+cancer+rna+seq
 
-K-means: 6 clusters, silhouette score 0.22890954496507346
-Spectral: 6 clusters, silhouette score 0.22768382462981648
-Gaussian: 6 clusters, silhouette score 0.22890954496507346
+Performs four different clustering algorithms on the data: K-means, mini batch K-means, spectral clustering, and Gaussian mixture labelling. In clustering.py, each algorithm is tested with a number of clusters between 1 and 20, and results use the cluster number that gives the best silhouette score. In addition to this silhouette score, a mutual information score and Rand score are calculated between each clustering and the labels (of cancer type) in the original data set. (These scores are recorded in scores.csv.) Finally, the clusters for each algorithm are displayed on a plot of the data reduced to two dimensions using t-SNE (t-distributed stochastic neighbor embedding).
